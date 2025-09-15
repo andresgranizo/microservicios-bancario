@@ -132,7 +132,7 @@ docker-compose ps         # Verificar
 docker-compose logs -f    # Ver logs
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Ejecutar Pruebas
 ```bash
