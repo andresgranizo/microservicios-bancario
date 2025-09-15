@@ -93,7 +93,7 @@ make logs     # Ver logs
 
 1. **Clonar el repositorio:**
 ```bash
-git clone <repository-url>
+git clone git@github.com:andresgranizo/microservicios-bancario.git
 cd microservicios-bancario
 ```
 
