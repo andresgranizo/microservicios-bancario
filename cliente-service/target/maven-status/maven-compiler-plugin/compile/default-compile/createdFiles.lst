@@ -1,0 +1,12 @@
+com/bank/cliente/repository/PersonaRepository.class
+com/bank/cliente/exception/ClienteAlreadyExistsException.class
+com/bank/cliente/service/ClienteService.class
+com/bank/cliente/repository/ClienteRepository.class
+com/bank/cliente/controller/ClienteController.class
+com/bank/cliente/dto/ClienteDTO.class
+com/bank/cliente/entity/Persona.class
+com/bank/cliente/exception/GlobalExceptionHandler$ErrorResponse.class
+com/bank/cliente/exception/ClienteNotFoundException.class
+com/bank/cliente/exception/GlobalExceptionHandler.class
+com/bank/cliente/ClienteServiceApplication.class
+com/bank/cliente/entity/Cliente.class

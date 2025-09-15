@@ -1,0 +1,82 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: banco_postgres
+    environment:
+      POSTGRES_DB: bancodb
+      POSTGRES_USER: banco_user
+      POSTGRES_PASSWORD: banco_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/BaseDatos.sql:/docker-entrypoint-initdb.d/BaseDatos.sql
+    networks:
+      - banco_network
+
+  # RabbitMQ for async communication
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: banco_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - banco_network
+
+  # Cliente Service
+  cliente-service:
+    build: ./cliente-service
+    container_name: cliente_service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bancodb
+      SPRING_DATASOURCE_USERNAME: banco_user
+      SPRING_DATASOURCE_PASSWORD: banco_pass
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - banco_network
+    restart: unless-stopped
+
+  # Cuenta Service
+  cuenta-service:
+    build: ./cuenta-service
+    container_name: cuenta_service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bancodb
+      SPRING_DATASOURCE_USERNAME: banco_user
+      SPRING_DATASOURCE_PASSWORD: banco_pass
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      CLIENTE_SERVICE_URL: http://cliente-service:8081
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - cliente-service
+    networks:
+      - banco_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  banco_network:
+    driver: bridge
