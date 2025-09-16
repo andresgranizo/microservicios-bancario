@@ -1,0 +1,102 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: bancodb
+          POSTGRES_USER: banco_user
+          POSTGRES_PASSWORD: banco_pass
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Initialize Database
+      run: |
+        PGPASSWORD=banco_pass psql -h localhost -U banco_user -d bancodb -f scripts/BaseDatos.sql
+        
+    - name: Test Cliente Service
+      run: |
+        cd cliente-service
+        mvn clean test
+        
+    - name: Test Cuenta Service  
+      run: |
+        cd cuenta-service
+        mvn clean test
+        
+    - name: Generate Test Report
+      run: |
+        echo "## 📊 Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "### Cliente Service Tests" >> $GITHUB_STEP_SUMMARY
+        if [ -f cliente-service/target/surefire-reports/TEST-*.xml ]; then
+          echo "✅ Cliente Service tests completed" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "### Cuenta Service Tests" >> $GITHUB_STEP_SUMMARY
+        if [ -f cuenta-service/target/surefire-reports/TEST-*.xml ]; then
+          echo "✅ Cuenta Service tests completed" >> $GITHUB_STEP_SUMMARY
+        fi
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Build Cliente Service
+      run: |
+        cd cliente-service
+        mvn clean package -DskipTests
+        
+    - name: Build Cuenta Service
+      run: |
+        cd cuenta-service  
+        mvn clean package -DskipTests
+        
+    - name: Build Docker Images
+      run: |
+        docker-compose build
+        
+    - name: Generate Build Report
+      run: |
+        echo "## 🚀 Build Results" >> $GITHUB_STEP_SUMMARY
+        echo "✅ All services built successfully" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Docker images created" >> $GITHUB_STEP_SUMMARY

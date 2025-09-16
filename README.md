@@ -1,6 +1,13 @@
 # Microservicios Bancario
 
-Sistema bancario implementado con arquitectura de microservicios usando Spring Boot, que incluye gestión de clientes, cuentas y movimientos con comunicación asíncrona entre servicios.
+[![CI/CD Pipeline](https://github.com/andresgranizo/microservicios-bancario/actions/workflows/ci.yml/badge.svg)](https://github.com/andresgranizo/microservicios-bancario/actions/workflows/ci.yml)
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.java.net/projects/jdk/17/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-enabled-blue.svg)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+Sistema bancario implementado con arquitectura de microservicios.
 
 ## Arquitectura
 
@@ -134,14 +141,24 @@ docker-compose logs -f    # Ver logs
 
 ## Testing
 
-### Ejecutar Pruebas
+### Ejecutar Pruebas Localmente
 ```bash
-# Pruebas unitarias
-./mvnw test
+# Pruebas unitarias y de integración
+make test
 
-# Pruebas de integración
-./mvnw integration-test
+# O manualmente por servicio
+cd cliente-service && mvn test
+cd cuenta-service && mvn test
 ```
+
+### CI/CD con GitHub Actions
+El proyecto incluye un pipeline automatizado que:
+- ✅ Ejecuta todas las pruebas automáticamente en cada push/PR
+- ✅ Construye las imágenes Docker
+- ✅ Valida la integridad del código
+- ✅ Genera reportes de pruebas
+
+**Estado actual:** ![CI/CD Status](https://github.com/andresgranizo/microservicios-bancario/actions/workflows/ci.yml/badge.svg)
 
 ### Postman Collection
 Importar el archivo `Microservicios-Bancario.postman_collection.json` en Postman para probar todos los endpoints.
@@ -186,10 +203,11 @@ El script `scripts/BaseDatos.sql` contiene:
 - **Base de Datos:** PostgreSQL, H2 (desarrollo)
 - **ORM:** Spring Data JPA, Hibernate
 - **Testing:** JUnit 5, Mockito, Spring Boot Test
-- **Containerización:** Docker
+- **Containerización:** Docker, Docker Compose
 - **Comunicación:** Spring Cloud OpenFeign
 - **Mensajería:** RabbitMQ
 - **Documentación:** SpringDoc OpenAPI 3 (Swagger UI)
+- **CI/CD:** GitHub Actions
 
 
 ## Casos de Uso Implementados
