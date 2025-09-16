@@ -153,10 +153,10 @@ cd cuenta-service && mvn test
 
 ### CI/CD con GitHub Actions
 El proyecto incluye un pipeline automatizado que:
-- ✅ Ejecuta todas las pruebas automáticamente en cada push/PR
-- ✅ Construye las imágenes Docker
-- ✅ Valida la integridad del código
-- ✅ Genera reportes de pruebas
+-  Ejecuta todas las pruebas automáticamente en cada push/PR
+-  Construye las imágenes Docker
+-  Valida la integridad del código
+-  Genera reportes de pruebas
 
 **Estado actual:** ![CI/CD Status](https://github.com/andresgranizo/microservicios-bancario/actions/workflows/ci.yml/badge.svg)
 
