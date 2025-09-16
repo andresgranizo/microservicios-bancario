@@ -91,9 +91,21 @@ jobs:
         cd cuenta-service  
         mvn clean package -DskipTests
         
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+        
     - name: Build Docker Images
       run: |
-        docker-compose build
+        # Intentar con docker compose, si falla usar docker build directamente
+        if command -v docker-compose &> /dev/null; then
+          docker-compose build
+        elif docker compose version &> /dev/null; then
+          docker compose build
+        else
+          echo "Building images with docker build..."
+          docker build -t microservicios-bancario-cliente-service ./cliente-service
+          docker build -t microservicios-bancario-cuenta-service ./cuenta-service
+        fi
         
     - name: Generate Build Report
       run: |
